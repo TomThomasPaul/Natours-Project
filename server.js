@@ -1,4 +1,4 @@
-console.log('ServerJs');
+console.log('ServerJs');//test comment
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 dotenv.config({ path: `${__dirname}/config.env` });
