@@ -9,7 +9,7 @@ const globalErrorHandler = require(`${__dirname}/controllers/errorController`);
 
 const app = express(); //express is a function that will return a bunch of methods to app variable
 
-app.use((req, res, next) => { //allow th react app in react course to get data from this node js server
+app.use((req, res, next) => { //allow  react app in react course to get data from this node js server
   res.header('Access-Control-Allow-Origin', '*');
   next();
 });
@@ -17,9 +17,10 @@ app.use(express.json()); //middleware needed when using POST
 app.use(express.static(`${__dirname}/public`)); //this is to serve static files which cant be served through route
 
 app.use((req, res, next) => {
-  //order of middleware functions matter ..it imapcts the request response cycle
+  //order of middleware functions matter ..it impacts the request response cycle
   //console.log('Hello from the middleware');
   req.requestTime = new Date().toISOString();
+ // console.log(x);  this line will throw error only when there is an incoming request since middlewares are part of request response cycle.
   next();
 });
 

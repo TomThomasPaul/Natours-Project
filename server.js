@@ -1,6 +1,15 @@
 console.log('ServerJs');//test comment
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+
+process.on("uncaughtException", (err)=>{  //handle uncaught exception placed on top so that any synchronous errors below this line would be caught.
+  console.log(err);
+  console.log("Unhandled Exception!! SHUTTING DOWN");
+  
+  process.exit(1);
+  
+  })
+
 dotenv.config({ path: `${__dirname}/config.env` });
 
 const DB = process.env.DATABASE.replace(
@@ -43,6 +52,19 @@ const app = require(`./app`);
 //console.log(app.get('env'));
 //console.log('just after require app');
 const port = process.env.PORT || 1440;
-app.listen(port, '127.0.0.1', () => {
+const server = app.listen(port, '127.0.0.1', () => {
   console.log(`Server is listening now on port ${port}`);
 });
+
+
+process.on("unhandledRejection", (err)=>{  //handle unhandled rejections in a global place
+console.log(err);
+console.log("Unhandled rejection!! SHUTTING DOWN");
+server.close(()=>{
+process.exit(1);
+
+})
+
+})
+
+

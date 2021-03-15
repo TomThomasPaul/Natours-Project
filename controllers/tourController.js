@@ -1,6 +1,7 @@
 const { query } = require('express');
 
 const APIFeatures = require(`${__dirname}/../utils/apiFeatures`);
+const AppError=require(`${__dirname}/../utils/appError`);
 
 console.log('TourController');
 //const fs = require('fs');
@@ -94,7 +95,13 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
 });
 exports.getTour = catchAsync(async (req, res, next) => {
   console.log(`Inside get tour`);
-  const tour = await Tour.findById(req.params.id); //same as Tour.findOne({_id : req.params.id})
+ // console.log(`${process.env.NODE_ENV}`);
+  const tour = await Tour.findById(req.params.id);  /* , ()=>{
+
+    next(new AppError(`No Tour found for ID ${req.params.id}`, 404))
+  }*/          //same as Tour.findOne({_id : req.params.id})
+  
+
 
   res.status(200).json({
     status: 'Success',
@@ -118,7 +125,10 @@ exports.updateTour = catchAsync(async (req, res, next) => {
   const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
-  });
+  }/*,()=>{
+
+    next(new AppError(`No Tour found for ID ${req.params.id}`, 404))
+  }*/);
 
   res.status(200).json({
     status: 'Success',
@@ -136,7 +146,10 @@ exports.updateTour = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteTour = catchAsync(async (req, res, next) => {
-  await Tour.findByIdAndDelete(req.params.id);
+  await Tour.findByIdAndDelete(req.params.id,()=>{
+
+    next(new AppError(`No Tour found for ID ${req.params.id}`, 404))
+  });
   res.status(204).json({
     status: 'Success',
     data: null,
@@ -147,7 +160,10 @@ exports.createTour = catchAsync(async (req, res, next) => {
 
   //another method to create document
 
-  const newTour = await Tour.create(req.body);
+  const newTour = await Tour.create(req.body);  /*,(err)=>{
+
+    next(new AppError(`No Tour created for this request. Error description : ${err}`, 400))
+  });*/
 
   res.status(201).json({
     status: 'Success',
