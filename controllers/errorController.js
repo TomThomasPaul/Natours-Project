@@ -31,6 +31,17 @@ const handleValidationErrorsDB=(error)=>{
    
    }
 
+   const handleJsonWebTokenError =()=>{
+
+    return new AppError("Invalid Token. Please login again",401);
+   }
+
+   const handleTokenExpiredError =()=>{
+
+    return new AppError(`Token expired after ${process.env.JWT_EXPIRES_IN} milliseconds. Please login again`,401);
+   }
+
+
 const sendErrorDev = (err,res)=>{
   console.log("entered dev handler");
   res.status(err.statusCode).json({
@@ -89,9 +100,13 @@ sendErrorDev(err,res);
   
   }else if(error.code == 11000){
      error = handleDuplicateFieldsDB(error);
-   }else if(error.name="ValidationError"){
+   }else if(error.name=="ValidationError"){
 
     error = handleValidationErrorsDB(error);
+   } else if(error.name =="JsonWebTokenError"){
+    error = handleJsonWebTokenError();
+   }else if(error.name =="TokenExpiredError"){
+    error = handleTokenExpiredError();
    }
    sendErrorProd(error,res);   
 
