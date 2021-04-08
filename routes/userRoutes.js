@@ -11,6 +11,11 @@ router.post(`/login`, authController.login);
 
 router.post(`/forgotPassword`, authController.forgotPassword);//will receive the email address to which a link with token has to be sent
 router.patch(`/resetPassword/:token`, authController.resetPassword); // will receive the new password and token to reset password
+
+router.patch(`/updateMyPassword`, authController.protect, authController.updatePassword); 
+router.patch(`/updateMe`, authController.protect, userController.updateMe); 
+router.patch(`/deleteMe`, authController.protect, userController.deleteMe); 
+
 router
   .route(`/`)
   .get(authController.protect, userController.getAllUsers)

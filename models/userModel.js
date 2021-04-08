@@ -24,7 +24,7 @@ password :{
 
     type: String,
     required: [true, "Please provide a password"],
-    select:false //this ensures that password is not visible in the response when doing a find() or findOne()
+    select:false //this ensures that password is not visible in the response when doing a find() or findOne()...it is visble after creating a document though in the response of signup
 },
 passwordConfirm :{
 
@@ -41,7 +41,13 @@ passwordConfirm :{
 
 passwordChangedAt : Date,
 passwordResetToken : String,
-passwordResetExpires : Date
+passwordResetExpires : Date,
+active : {
+type : Boolean,
+default : true,
+select :false
+
+}
 
 
 })
@@ -73,6 +79,12 @@ userSchema.methods.correctPassword = async function(passwordFromRequest, passwor
   //we could have just passed in passwordFromRequest and used this.password to compare. But this.password has select= false in schema, so we cant retrieve it in the controller when we call this method
 
 }
+
+userSchema.pre(/^find/, function(next){
+
+  this.find({active : {$ne : false}});
+  next();
+})
 
 userSchema.methods.changedPassword = function(jwtTimeStamp){
     console.log("entered changed password 1")

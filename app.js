@@ -6,6 +6,11 @@ const tourRouter = require(`${__dirname}/routes/tourRoutes`);
 const userRouter = require(`${__dirname}/routes/userRoutes`);
 const AppError = require(`${__dirname}/utils/appError`);
 const globalErrorHandler = require(`${__dirname}/controllers/errorController`);
+const rateLimit = require("express-rate-limit");
+const helmet = require("helmet");
+const mongoSanitize = require("express-mongo-sanitize");
+const xssClean = require("xss-clean");
+const hpp = require("hpp");
 
 const app = express(); //express is a function that will return a bunch of methods to app variable
 
@@ -13,7 +18,26 @@ app.use((req, res, next) => { //allow  react app in react course to get data fro
   res.header('Access-Control-Allow-Origin', '*');
   next();
 });
-app.use(express.json()); //middleware needed when using POST
+app.use(express.json({limit : '10Kb'})); //middleware needed when using POST..body parser..to facilitate req.body......
+
+//Data sanitization 
+//against nosql query injection
+
+app.use(mongoSanitize());
+
+//sanitize against xss
+
+app.use(xssClean());
+
+//prevent parameter pollution
+
+app.use(hpp({
+whitelist :["duration","ratingsQuantity","ratingsAverage", "maxGroupSize", "difficulty", "price"] //manually choosing some fields
+
+
+
+}));
+
 app.use(express.static(`${__dirname}/public`)); //this is to serve static files which cant be served through route
 
 app.use((req, res, next) => {
@@ -24,10 +48,22 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(helmet());
 //console.log(`This is from appJs ${process.env.NODE_ENV}`);
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
+
+const limiter = rateLimit({
+max : 100,
+windowMs : 60*60*1000,
+message : "Too many requests from this IP. Please try after an hour"
+
+
+});
+
+
+app.use('/api',limiter);
 
 /*app.get('/', (req, res) => {
   //res.status(200).send('Response from the Server using Express');
