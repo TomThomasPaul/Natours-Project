@@ -144,10 +144,10 @@ next(); // call the controller if all OK
 } )
 
 
-exports.restrictTo = ()=>{
+exports.restrictTo = (...roles)=>{
 
     return (req,res,next)=>{
-        roles = ['admin', 'lead-guide'];
+     // let  roles = ['admin', 'lead-guide'];
         if(!roles.includes(req.user.role)){
 
         next(new AppError("You do not have permission for this action", 403));

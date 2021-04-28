@@ -5,6 +5,8 @@ const dotenv = require('dotenv');
 dotenv.config({ path: `${__dirname}/../../config.env` });
 
 const Tour = require(`${__dirname}/../../models/tourModel`);
+const User = require(`${__dirname}/../../models/userModel`);
+const Review = require(`${__dirname}/../../models/reviewModel`);
 
 const DB = process.env.DATABASE.replace(
   '<PASSWORD>',
@@ -27,7 +29,13 @@ mongoose
 //Read tours from file
 
 const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/tours-simple.json`, 'utf-8')
+  fs.readFileSync(`${__dirname}/tours.json`, 'utf-8')
+);
+const users = JSON.parse(
+  fs.readFileSync(`${__dirname}/users.json`, 'utf-8')
+);
+const reviews = JSON.parse(
+  fs.readFileSync(`${__dirname}/reviews.json`, 'utf-8')
 );
 
 //Import tours from file to database
@@ -36,6 +44,10 @@ const importData = async () => {
   try {
     await Tour.create(tours);
     console.log('Tours imported to database form json file');
+    await User.create(users, {validateBeforeSave : false });//to avoid passwordConfirmerror
+    console.log('Users imported to database form json file');
+    await Review.create(reviews);
+    console.log('Reviews imported to database form json file');
   } catch (err) {
     console.log(
       `Error importing all data into database . The error details are ${err}`
@@ -51,6 +63,10 @@ const deleteData = async () => {
   try {
     await Tour.deleteMany();
     console.log('Tours deleted from database form json file');
+    await User.deleteMany();
+    console.log('Users deleted from database form json file');
+    await Review.deleteMany();
+    console.log('Reviews deleted from database form json file');
   } catch (err) {
     console.log(
       `Error deleting all records from database. The error details are ${err}`

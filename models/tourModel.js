@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
 const validator = require('validator');
+const User = require('./userModel');
 const tourSchema = new mongoose.Schema(
   {
     name: {
@@ -39,7 +40,11 @@ const tourSchema = new mongoose.Schema(
       },
     },
 
-    ratingsAverage: { type: Number, default: 4.5 },
+    ratingsAverage: { type: Number, 
+      default: 4.5 ,
+      set : val=>(Math.round(val*10))/10
+    
+    },
 
     ratingsQuantity: { type: Number, default: 0 },
 
@@ -69,6 +74,49 @@ const tourSchema = new mongoose.Schema(
       required: [true, 'Summary cant be blank'],
     },
 
+    startLocation :{
+
+      type : {
+         type : String,
+         default : 'Point',
+         enum : ['Point']
+
+      },
+      coordinates : [Number],
+      address : String,
+      description : String
+
+    },
+
+    locations : [
+
+      {
+
+        type : {
+           type : String,
+           default : 'Point',
+           enum : ['Point']
+  
+        },
+        coordinates : [Number],
+        address : String,
+        description : String,
+        day : Number
+  
+      }
+
+
+
+
+    ],
+
+    guides : [
+         {type:mongoose.Schema.ObjectId,
+          ref : 'User'
+        }
+
+    ],
+
     description: { type: String, trim: true },
 
     imageCover: {
@@ -87,11 +135,25 @@ const tourSchema = new mongoose.Schema(
   }
 );
 
+//create indexes
+tourSchema.index({price : 1, ratingsAverage : -1});
+tourSchema.index({slug :1});
+tourSchema.index({startLocation : '2dsphere'});
+
 //Virtual Properties
 tourSchema.virtual('durationWeeks').get(function () {
   //arrow function is used because they dont have their own this variable.
 
   return this.duration / 7;
+});
+
+tourSchema.virtual('reviews', {
+  
+  ref : 'Review',
+  foreignField : 'tour',
+  localField : '_id'
+
+ 
 });
 
 //Document middleware
@@ -104,6 +166,29 @@ tourSchema.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });
   next();
 });
+
+//below code embedss user guides in tours
+// tourSchema.pre('save', async function(next){
+// let guidesTemp = [...this.guides];
+// this.guides=[]; //reinitializa guides
+
+// await guidesTemp.forEach(async id=> {
+  
+  
+//   let guide = await User.findById(id);
+//   this.guides.push(guide);
+  
+  
+
+// });
+
+
+//console.log("This is guides Temp");
+//console.log(guidesTemp);
+
+// next();
+
+// });
 
 tourSchema.pre('save', function (next) {
   console.log('Document will be saved');
@@ -123,6 +208,20 @@ tourSchema.pre(/^find/, function (next) {
   this.find({ secretTour: { $ne: true } });
   next();
 });
+
+
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+
+    path: 'guides',
+    select : '-__v -passwordChangedAt'
+    
+    
+      }); 
+
+      next();
+});
+
 
 tourSchema.post(/^find/, function (docs, next) {
   console.log('Post Query Find hook middleware triggered');

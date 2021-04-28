@@ -71,7 +71,7 @@ if(!this.isModified('password') || this.isNew){
 
 this.passwordChangedAt = Date.now() -1000; // subtract 1 sec from pass changed at bcz at times, saving to database is slower than token generation. so it affects jwt timestamp and passwrdchanged timestamp
 next();
-});
+}); 
 
 userSchema.methods.correctPassword = async function(passwordFromRequest, passwordDB){ //this instance method will be available in all docs
 

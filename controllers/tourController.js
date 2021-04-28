@@ -2,6 +2,7 @@ const { query } = require('express');
 
 const APIFeatures = require(`${__dirname}/../utils/apiFeatures`);
 const AppError=require(`${__dirname}/../utils/appError`);
+const factory = require('./factoryHandler');
 
 console.log('TourController');
 //const fs = require('fs');
@@ -46,129 +47,63 @@ exports.aliasTop5 = (req, res, next) => {
   next();
 };
 
-exports.getAllTours = catchAsync(async (req, res, next) => {
-  console.log(`Inside get All tours`);
-  // const tours = await Tour.find();
-
-  //Different ways of using query string...query string is different from parameters. Usage of parameter is api/id
-  //where id is parameter . api?id=4 ..here ?id=4 is queryString
-  // 1st way----const tours = await Tour.find({
-  //   $or: [{ difficulty: 'easy' }, { price: { $gt: 1000 } }],
-  //   duration: 10,
-  // });
-
-  //2nd way ---const tours = await Tour.find(req.query); //req.query returns a query object with all key values in the query
-
-  // 3rd way---const tours = await Tour.find()
-  //   .where('duration')
-  //   .equals(5)
-  //   .where('difficulty')
-  //   .equals('easy');
-
-  //const queryObj = {...req.query};
-
-  //console.log('Before instantiation');
-  const features = new APIFeatures(Tour.find(), req.query);
-  // console.log('Before filter');
-  features.filter().sorting().limiting().paginate();
-  // console.log(features.queryObject);
-  // console.log(features.query);
-  const tours = await features.query;
-  //console.log(tours);
-
-  res.status(200).json({
-    status: 'Success',
-    results: tours.length,
-    data: {
-      tours: tours,
-    },
-  });
-
-  // res.status(200).json({
-  //   status: 'Success',
-  //   requestTime: req.requestTime,
-  //   results: tours.length,
-  //   data: {
-  //     tours: tours,
-  //   },
-  // });
-});
-exports.getTour = catchAsync(async (req, res, next) => {
-  console.log(`Inside get tour`);
- // console.log(`${process.env.NODE_ENV}`);
-  const tour = await Tour.findById(req.params.id);  /* , ()=>{
-
-    next(new AppError(`No Tour found for ID ${req.params.id}`, 404))
-  }*/          //same as Tour.findOne({_id : req.params.id})
-  
+exports.getAllTours = factory.getAll(Tour);
+exports.getTour = factory.getOne(Tour,{path : 'reviews'});
 
 
-  res.status(200).json({
-    status: 'Success',
-    data: {
-      tour: tour,
-    },
-  });
+exports.updateTour = factory.updateOne(Tour);
+// exports.updateTour = catchAsync(async (req, res, next) => {
+//   const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+//     new: true,
+//     runValidators: true,
+//   }/*,()=>{
 
-  //console.log(req.params);
-  // const id = req.params.id * 1;
-  // const tour = tours.find((el) => el.id === id);
-  // res.status(200).json({
-  //   status: 'Success',
-  //   //results: tours.length,
-  //   data: {
-  //     tour,
-  //   },
-  // });
-});
-exports.updateTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  }/*,()=>{
+//     next(new AppError(`No Tour found for ID ${req.params.id}`, 404))
+//   }*/);
 
-    next(new AppError(`No Tour found for ID ${req.params.id}`, 404))
-  }*/);
+//   res.status(200).json({
+//     status: 'Success',
+//     data: {
+//       tour: tour,
+//     },
+//   });
 
-  res.status(200).json({
-    status: 'Success',
-    data: {
-      tour: tour,
-    },
-  });
+//   // res.status(200).json({
+//   //   status: 'Success',
+//   //   data: {
+//   //     tour: 'updated tour here',
+//   //   },
+//   // });
+// });
 
-  // res.status(200).json({
-  //   status: 'Success',
-  //   data: {
-  //     tour: 'updated tour here',
-  //   },
-  // });
-});
 
-exports.deleteTour = catchAsync(async (req, res, next) => {
-  await Tour.findByIdAndDelete(req.params.id);
-  res.status(204).json({
-    status: 'Success',
-    data: null,
-  });
-});
-exports.createTour = catchAsync(async (req, res, next) => {
-  console.log(req.body);
+exports.deleteTour =factory.deleteOne(Tour);
+exports.createTour =factory.createOne(Tour);
 
-  //another method to create document
+// exports.deleteTour = catchAsync(async (req, res, next) => {
+//   await Tour.findByIdAndDelete(req.params.id);
+//   res.status(204).json({
+//     status: 'Success',
+//     data: null,
+//   });
+// });
+// exports.createTour = catchAsync(async (req, res, next) => {
+//   console.log(req.body);
 
-  const newTour = await Tour.create(req.body);  /*,(err)=>{
+//   //another method to create document
 
-    next(new AppError(`No Tour created for this request. Error description : ${err}`, 400))
-  });*/
+//   const newTour = await Tour.create(req.body);  /*,(err)=>{
 
-  res.status(201).json({
-    status: 'Success',
-    data: {
-      tour: newTour,
-    },
-  });
-});
+//     next(new AppError(`No Tour created for this request. Error description : ${err}`, 400))
+//   });*/
+
+//   res.status(201).json({
+//     status: 'Success',
+//     data: {
+//       tour: newTour,
+//     },
+//   });
+// });
 
 // const newId = tours[tours.length - 1].id + 1;
 // const newTour = Object.assign({ id: newId }, req.body);
@@ -271,6 +206,30 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
     status: 'Success',
     data: {
       plan,
+    },
+  });
+});
+
+exports.getToursWithinRadius = catchAsync(async (req, res, next) => {
+ 
+const {distance, latlng, unit} = req.params;
+
+const [lat,lng] = latlng.split(',');
+
+if(!lat || !lng){
+
+  return next(new AppError("Please enter latitude and longitude appropriately"), 400);
+}
+
+const radius = unit=='mi'? distance/3963.2 : distance/6378.1 ;
+
+const tours = await Tour.find({startLocation : {$geoWithin : { $centerSphere : [[lng,lat],radius]}}}); //also set index for start location in model tours
+
+  res.status(200).json({
+    status: 'Success',
+    results :tours.length,
+    data: {
+      data : tours
     },
   });
 });

@@ -6,19 +6,25 @@ const authController = require(`./../controllers/authController`);
 const router = express.Router(); //create user router
 
 
+
 router.post(`/signup`, authController.signUp);
 router.post(`/login`, authController.login);
 
 router.post(`/forgotPassword`, authController.forgotPassword);//will receive the email address to which a link with token has to be sent
 router.patch(`/resetPassword/:token`, authController.resetPassword); // will receive the new password and token to reset password
 
-router.patch(`/updateMyPassword`, authController.protect, authController.updatePassword); 
-router.patch(`/updateMe`, authController.protect, userController.updateMe); 
-router.patch(`/deleteMe`, authController.protect, userController.deleteMe); 
+router.use(authController.protect); //use protect as middleware to protect all routes below this point.
+
+router.patch(`/updateMyPassword`, authController.updatePassword); 
+router.patch(`/updateMe`, userController.updateMe); 
+router.patch(`/deleteMe`, userController.deleteMe); 
+router.get(`/me`, userController.getMe, userController.getUser);
+
+router.use(authController.restrictTo('admin')); //only admins can have access to the routes below this point
 
 router
   .route(`/`)
-  .get(authController.protect, userController.getAllUsers)
+  .get( userController.getAllUsers)
   .post(userController.createUser);
 
 router

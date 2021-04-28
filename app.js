@@ -4,6 +4,8 @@ const express = require('express');
 const morgan = require('morgan');
 const tourRouter = require(`${__dirname}/routes/tourRoutes`);
 const userRouter = require(`${__dirname}/routes/userRoutes`);
+const reviewRouter = require(`${__dirname}/routes/reviewRoutes`);
+
 const AppError = require(`${__dirname}/utils/appError`);
 const globalErrorHandler = require(`${__dirname}/controllers/errorController`);
 const rateLimit = require("express-rate-limit");
@@ -81,6 +83,7 @@ app.post('/', (req, res) => {
 */
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/reviews', reviewRouter);
 
 //Handing error for unhandled routes ...put this after all routes so that it is caught only if the valid routes are not picked up
 

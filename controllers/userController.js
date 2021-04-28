@@ -4,8 +4,15 @@ const { findByIdAndUpdate } = require("../models/userModel");
 const AppError=require(`${__dirname}/../utils/appError`);
 const User = require(`${__dirname}/../models/userModel`);
 const catchAsync = require(`${__dirname}/../utils/catchAsync`);
+const factory = require('./factoryHandler');
 console.log('UserController');
 
+
+exports.getMe = (req,res,next)=>{
+
+req.params.id = req.user.id;
+next();
+};
 
 
 exports.deleteMe = catchAsync(async(req,res,next)=>{
@@ -66,31 +73,27 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
   // });
 });
 
-exports.getUser = (req, res) => {
-  res.status(500).json({
-    status: 'Error',
-    message: 'This route has not yet been handled',
-  });
-};
+exports.getUser = factory.getOne(User);
 
-exports.updateUser = (req, res) => {
-  res.status(500).json({
-    status: 'Error',
-    message: 'This route has not yet been handled',
-  });
-};
 
-exports.deleteUser = (req, res) => {
-  res.status(500).json({
-    status: 'Error',
-    message: 'This route has not yet been handled',
-  });
-};
+exports.getAllUsers = factory.getAll(User);
 
-exports.createUser = (req, res) => {
-  res.status(500).json({
-    status: 'Error',
-    message: 'This route has not yet been handled',
-  });
-};
+exports.deleteUser = factory.deleteOne(User); 
+exports.updateUser = factory.updateOne(User); 
+exports.createUser = factory.createOne(User);
+//exports.createUser = factory.createOne(User); we have signup functionality already
+
+// exports.deleteUser = (req, res) => {
+//   res.status(500).json({
+//     status: 'Error',
+//     message: 'This route has not yet been handled',
+//   });
+// };
+
+// exports.createUser = (req, res) => {
+//   res.status(500).json({
+//     status: 'Error',
+//     message: 'This route has not yet been handled',
+//   });
+// };
 //****************
