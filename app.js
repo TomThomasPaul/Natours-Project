@@ -1,5 +1,6 @@
 console.log('AppJs');
 //const fs = require('fs');
+const path = require('path');
 const express = require('express');
 const morgan = require('morgan');
 const tourRouter = require(`${__dirname}/routes/tourRoutes`);
@@ -15,6 +16,9 @@ const xssClean = require("xss-clean");
 const hpp = require("hpp");
 
 const app = express(); //express is a function that will return a bunch of methods to app variable
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
+app.use(express.static(path.join(__dirname, 'public'))); //this is to serve static files which cant be served through route
 
 app.use((req, res, next) => { //allow  react app in react course to get data from this node js server
   res.header('Access-Control-Allow-Origin', '*');
@@ -40,7 +44,7 @@ whitelist :["duration","ratingsQuantity","ratingsAverage", "maxGroupSize", "diff
 
 }));
 
-app.use(express.static(`${__dirname}/public`)); //this is to serve static files which cant be served through route
+
 
 app.use((req, res, next) => {
   //order of middleware functions matter ..it impacts the request response cycle
@@ -81,6 +85,14 @@ app.post('/', (req, res) => {
     .json({ message: `You can post to this endpoint`, app: `Natours` });
 });
 */
+
+app.get('/', (req,res)=>{
+
+res.status(200).render('base', {
+  tour : 'The Forest Hiker',
+  user : 'Tom'
+});
+});
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);

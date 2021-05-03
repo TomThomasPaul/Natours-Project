@@ -231,11 +231,11 @@ tourSchema.post(/^find/, function (docs, next) {
 });
 
 //Aggregation middleware
-tourSchema.pre('aggregate', function (next) {
-  console.log('Pre Aggregate hook middleware triggered');
-  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } }); //this points to aggregation object and this.pipeline gives the pipeline gives array of provided aggregate method
-  next();
-});
+// tourSchema.pre('aggregate', function (next) {
+//   console.log('Pre Aggregate hook middleware triggered');
+//   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } }); //this points to aggregation object and this.pipeline gives the pipeline gives array of provided aggregate method
+//   next();
+// }); //commenting out for geospatial query to find all distances
 
 const Tour = mongoose.model('Tour', tourSchema);
 module.exports = Tour;

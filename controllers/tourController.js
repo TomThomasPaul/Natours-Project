@@ -233,3 +233,60 @@ const tours = await Tour.find({startLocation : {$geoWithin : { $centerSphere : [
     },
   });
 });
+
+exports.getDistances = catchAsync(async (req, res, next) => {
+ 
+  const {latlng, unit} = req.params;
+  
+  const [lat,lng] = latlng.split(',');
+  
+  if(!lat || !lng){
+  
+    return next(new AppError("Please enter latitude and longitude appropriately"), 400);
+  }
+  
+  const multiplier = unit=='mi'? 0.000621371 : 0.001 ;
+  
+  const distances = await Tour.aggregate([{
+
+
+$geoNear : {
+        
+  near: { //ORIGIN frpm which distances are calculated to all start locations
+
+    type: 'Point',
+    coordinates: [lng * 1,lat * 1]
+  },
+  distanceField : 'distance', //name of field where all distances to tours from origin location is stored
+  distanceMultiplier : multiplier
+
+    },
+
+   
+
+
+
+
+  },
+
+  {
+    $project : {
+
+      distance : 1,
+      name : 1
+    }
+
+
+  }
+
+
+]);
+  
+    res.status(200).json({
+      status: 'Success',
+      data: {
+        data : distances
+      },
+    });
+  });
+  
