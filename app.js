@@ -6,6 +6,7 @@ const morgan = require('morgan');
 const tourRouter = require(`${__dirname}/routes/tourRoutes`);
 const userRouter = require(`${__dirname}/routes/userRoutes`);
 const reviewRouter = require(`${__dirname}/routes/reviewRoutes`);
+const viewRouter =require(`${__dirname}/routes/viewRoutes`);
 
 const AppError = require(`${__dirname}/utils/appError`);
 const globalErrorHandler = require(`${__dirname}/controllers/errorController`);
@@ -86,13 +87,8 @@ app.post('/', (req, res) => {
 });
 */
 
-app.get('/', (req,res)=>{
 
-res.status(200).render('base', {
-  tour : 'The Forest Hiker',
-  user : 'Tom'
-});
-});
+app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
