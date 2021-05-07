@@ -41,6 +41,20 @@ const createSendToken =(user, statusCode,res)=>{
 
 };
 
+exports.logout = async(req,res)=>{
+
+res.cookie('jwt', 'loggedout', {
+
+expires : new Date(Date.now() + 10 *1000),
+httpOnly :true
+
+
+})
+console.log("inside logout backend");
+
+res.status(200).json({status : 'success'});
+
+};
 exports.signUp = catchAsync(async (req,res,next)=>{
 
     const newUser =  await User.create({
@@ -99,6 +113,9 @@ if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')){
     
     token = req.headers.authorization.split(" ")[1];
     
+}else if(req.cookies.jwt){
+
+    token = req.cookies.jwt;
 }
 
 if(!token){
@@ -139,9 +156,55 @@ if(isPasswordChanged){
 //GRANT ACCESS TO THE USER BY CALLING NEXT()----Calls the route handler/controller
 
 req.user=existingUser;
+res.locals.user=existingUser;
 next(); // call the controller if all OK
 
 } )
+
+//only for rendered pages
+exports.isLoggedIn = async (req,res,next)=>{
+
+    //get token and check if its present
+    if(req.cookies.jwt){
+ 
+        try{
+
+            console.log('inside logged in..jwt cookie token is : ' + req.cookies.jwt);
+    const decode =await promisify(jwt.verify)(req.cookies.jwt,process.env.JWT_SECRET);
+    console.log(decode);
+    
+    //even if token is present, verify if the user is deleted from the system.
+    
+    const existingUser = await User.findById(decode.id);
+    
+    if(!existingUser){
+        
+        return next();
+    }
+    
+    //check if user changed password or not using an instance method
+    
+    const isPasswordChanged = await existingUser.changedPassword(decode.iat);
+    
+    if(isPasswordChanged){
+        return next();
+    
+    }
+    
+    //GRANT ACCESS TO THE USER BY CALLING NEXT()----Calls the route handler/controller
+    //at this point there is  alogged in user.
+    res.locals.user = existingUser;  //pug templates have access to res.locals
+    //req.user=existingUser;
+        
+        }catch(err){
+        return next();
+
+        }
+
+  
+}
+     next(); 
+    } 
 
 
 exports.restrictTo = (...roles)=>{

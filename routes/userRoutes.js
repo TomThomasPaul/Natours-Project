@@ -9,6 +9,7 @@ const router = express.Router(); //create user router
 
 router.post(`/signup`, authController.signUp);
 router.post(`/login`, authController.login);
+router.get(`/logout`, authController.logout);
 
 router.post(`/forgotPassword`, authController.forgotPassword);//will receive the email address to which a link with token has to be sent
 router.patch(`/resetPassword/:token`, authController.resetPassword); // will receive the new password and token to reset password

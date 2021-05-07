@@ -15,6 +15,7 @@ const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
 const xssClean = require("xss-clean");
 const hpp = require("hpp");
+const cookieParser = require('cookie-parser');
 
 const app = express(); //express is a function that will return a bunch of methods to app variable
 app.set('view engine', 'pug');
@@ -26,7 +27,7 @@ app.use((req, res, next) => { //allow  react app in react course to get data fro
   next();
 });
 app.use(express.json({limit : '10Kb'})); //middleware needed when using POST..body parser..to facilitate req.body......
-
+app.use(cookieParser()); //enable cookies from browser to the app
 //Data sanitization 
 //against nosql query injection
 
@@ -51,7 +52,7 @@ app.use((req, res, next) => {
   //order of middleware functions matter ..it impacts the request response cycle
   //console.log('Hello from the middleware');
   req.requestTime = new Date().toISOString();
- // console.log(x);  this line will throw error only when there is an incoming request since middlewares are part of request response cycle.
+  console.log(req.cookies); // this line will throw error only when there is an incoming request since middlewares are part of request response cycle.
   next();
 });
 

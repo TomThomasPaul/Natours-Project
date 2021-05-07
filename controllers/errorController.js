@@ -42,35 +42,74 @@ const handleValidationErrorsDB=(error)=>{
    }
 
 
-const sendErrorDev = (err,res)=>{
+const sendErrorDev = (err,req,res)=>{
   console.log("entered dev handler");
-  res.status(err.statusCode).json({
-    status: err.status,
-    error: err,
-    message: err.message,
-    stack : err.stack
-  });
+  //console.log(req.originalUrl);
+  if(req.originalUrl.startsWith('/api')){
+    res.status(err.statusCode).json({
+      status: err.status,
+      error: err,
+      message: err.message,
+      stack : err.stack
+    });
+
+  }else{
+    //console.log(res);
+    res.status(err.statusCode).render('error', {
+      title: 'Something went wrong',
+      msg: err.message
+    });
+  }
+  
+
 
 
 }
 
-const sendErrorProd = (err,res)=>{
+const sendErrorProd = (err,req,res)=>{
 console.log("Inside production error handler");
+if(req.originalUrl.startsWith('/api')){
+
   if(err.isOperational){
     res.status(err.statusCode).json({
+     
       status: err.status,
       message: err.message
     });
   }else{
 
-    res.status(err.statusCode).json({
-      status: "Error",
-      message: "Something went wrong"
+    res.status(err.statusCode).json( {
+      status: 'error',
+      message: 'Something went wrong'
     });
 
 
 
   }
+
+
+}else{
+
+  if(err.isOperational){
+    res.status(err.statusCode).render('error',{
+      title: 'Something went wrong',
+      msg: err.message
+    });
+  }else{
+
+    res.status(err.statusCode).render('error',{
+      status: "Something went wrong",
+      message: "Please try again later"
+    });
+
+
+
+  }
+
+
+
+}
+ 
   
     
 
@@ -90,7 +129,7 @@ module.exports = (err, req, res, next) => {
  if(process.env.NODE_ENV.startsWith("development")){
   //console.log(`${process.env.NODE_ENV}`);
  // sendErrorDev(err,res);
-sendErrorDev(err,res);
+sendErrorDev(err,req,res);
  }else if(process.env.NODE_ENV.startsWith("production")){
   //console.log(err);
   let error = {...err, name : err.name, message : err.message}; //destructuring name  and message as it is not avaiable in error message or err. it seems to be part of Error class from which err inherits
@@ -108,7 +147,7 @@ sendErrorDev(err,res);
    }else if(error.name =="TokenExpiredError"){
     error = handleTokenExpiredError();
    }
-   sendErrorProd(error,res);   
+   sendErrorProd(error,req,res);   
 
   
 
