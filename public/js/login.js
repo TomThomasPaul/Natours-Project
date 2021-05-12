@@ -8,7 +8,7 @@ try{
     const result = await axios({
 
         method : 'POST',
-        url : 'http://127.0.0.1:1440/api/v1/users/login',
+        url : '/api/v1/users/login',
         data : {
          email,
          password
@@ -47,7 +47,7 @@ try{
     const res = await axios({
 
         method : 'GET',
-        url : 'http://127.0.0.1:1440/api/v1/users/logout'
+        url : '/api/v1/users/logout'
         
         });
         // console.log("after ajax logout");

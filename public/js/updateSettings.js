@@ -4,7 +4,7 @@ import { showAlert } from "./alerts";
 
 export const updateSettings = async (data,type)=>{  //type is data or password
 
-    const url = type==='password'?'http://127.0.0.1:1440/api/v1/users/updateMyPassword' : 'http://127.0.0.1:1440/api/v1/users/updateMe'
+    const url = type==='password'?'/api/v1/users/updateMyPassword' : '/api/v1/users/updateMe'
 
     try{
        let result = await axios({

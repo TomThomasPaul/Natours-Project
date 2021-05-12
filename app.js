@@ -3,6 +3,7 @@ console.log('AppJs');
 const path = require('path');
 const express = require('express');
 const morgan = require('morgan');
+const compression = require('compression');
 const tourRouter = require(`${__dirname}/routes/tourRoutes`);
 const userRouter = require(`${__dirname}/routes/userRoutes`);
 const reviewRouter = require(`${__dirname}/routes/reviewRoutes`);
@@ -48,7 +49,7 @@ whitelist :["duration","ratingsQuantity","ratingsAverage", "maxGroupSize", "diff
 
 }));
 
-
+app.use(compression());
 
 app.use((req, res, next) => {
   //order of middleware functions matter ..it impacts the request response cycle
