@@ -51,7 +51,7 @@ testTour
 const app = require(`./app`);
 //console.log(app.get('env'));
 //console.log('just after require app');
-const port = process.env.PORT || 1440;
+const port = process.env.port || 1440;
 const server = app.listen(port, '127.0.0.1', () => {
   console.log(`Server is listening now on port ${port}`);
 });
