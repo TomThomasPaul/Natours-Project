@@ -7,6 +7,7 @@ const tourRouter = require(`${__dirname}/routes/tourRoutes`);
 const userRouter = require(`${__dirname}/routes/userRoutes`);
 const reviewRouter = require(`${__dirname}/routes/reviewRoutes`);
 const viewRouter =require(`${__dirname}/routes/viewRoutes`);
+const bookingRouter = require(`${__dirname}/routes/bookingRoutes`);
 
 const AppError = require(`${__dirname}/utils/appError`);
 const globalErrorHandler = require(`${__dirname}/controllers/errorController`);
@@ -26,8 +27,9 @@ app.use((req, res, next) => { //allow  react app in react course to get data fro
   res.header('Access-Control-Allow-Origin', '*');
   next();
 });
-app.use(express.json({limit : '10Kb'})); //middleware needed when using POST..body parser..to facilitate req.body......
+app.use(express.json({limit : '10kb'})); //middleware needed when using POST..body parser..to facilitate req.body......
 app.use(cookieParser()); //enable cookies from browser to the app
+app.use(express.urlencoded({extended:true, limit:'10kb'})); //allow urlencoded data when submitting forms
 //Data sanitization 
 //against nosql query injection
 
@@ -93,6 +95,7 @@ app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
+app.use('/api/v1/bookings', bookingRouter);
 
 //Handing error for unhandled routes ...put this after all routes so that it is caught only if the valid routes are not picked up
 

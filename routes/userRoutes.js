@@ -17,7 +17,7 @@ router.patch(`/resetPassword/:token`, authController.resetPassword); // will rec
 router.use(authController.protect); //use protect as middleware to protect all routes below this point.
 
 router.patch(`/updateMyPassword`, authController.updatePassword); 
-router.patch(`/updateMe`, userController.updateMe); 
+router.patch(`/updateMe`, userController.uploadPhoto, userController.resizeImages, userController.updateMe); 
 router.patch(`/deleteMe`, userController.deleteMe); 
 router.get(`/me`, userController.getMe, userController.getUser);
 

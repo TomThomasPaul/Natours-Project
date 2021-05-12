@@ -2,7 +2,8 @@ const User = require("./../models/userModel");
 const {promisify} = require("util");
 const catchAsync = require(`${__dirname}/../utils/catchAsync`);
 const AppError=require(`${__dirname}/../utils/appError`);
-const sendEmail=require(`${__dirname}/../utils/email`);
+//const sendEmail=require(`${__dirname}/../utils/email`);
+const Email=require(`${__dirname}/../utils/email`);
 const jwt =require("jsonwebtoken");
 const crypto = require("crypto");
 
@@ -28,7 +29,8 @@ const createSendToken =(user, statusCode,res)=>{
 
     res.cookie("jwt", token, cookieOptions);
     user.password = undefined; //just to remove the password from the response
-
+    
+    console.log("inside create token send");
     res.status(statusCode).json({
         status:"Success",
         token,
@@ -66,7 +68,8 @@ exports.signUp = catchAsync(async (req,res,next)=>{
         passwordConfirm: req.body.passwordConfirm,
         passwordChangedAt: req.body.passwordChangedAt
     });
-    
+    const url = `${req.protocol}://${req.get('host')}/me`;
+    await new Email(newUser,url).sendWelcome();
     //create jwt and send it back to user is response when they signs up
     createSendToken(newUser, 201, res);
 
@@ -247,13 +250,10 @@ console.log("entered forgot");
     
     const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to ${resetUrl}.\n If you did not forget your password, please ignore this email`;
     try{
-        await sendEmail({
-            email : user.email,//req.body.email should also work
-            subject : 'Your password reset token is here (valid for 10 minutes)',
-            message
-       
-       
-           });
+     
+        
+
+        await new Email(user, resetUrl).sendPasswordReset();
        
            res.status(200).json({
                status : "success",
@@ -290,13 +290,14 @@ exports.resetPassword = catchAsync(async (req,res,next)=>{
 //Set new password if token has not expired
 if (!user){
     next(new AppError("Token is invalid or expired for password reset",400))
-}    
-
+}     console.log("Incoming password");
+      console.log(req.body.password);
+      console.log(req.body.passwordConfirm);
       user.password = req.body.password;
       user.passwordConfirm =req.body.passwordConfirm;
       user.passwordResetToken=undefined;
       user.passwordResetExpires=undefined;
-      user.save();
+      await user.save();
 
       //update changedPasswordAt property for the user
       //login the user and return JWT
