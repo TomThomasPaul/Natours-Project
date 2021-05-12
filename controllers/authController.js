@@ -15,19 +15,20 @@ const signToken = id=>{
 
 }
 
-const createSendToken =(user, statusCode,res)=>{
+const createSendToken =(user, statusCode,req,res)=>{
 
     const token = signToken(user._id);
-    const cookieOptions = { 
+   
+
+   
+
+    res.cookie("jwt", token, { 
         expires : new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24*60*60*1000),
-        httpOnly : true
+        httpOnly : true,
+        secure: req.secure || req.headers['x-forwarded-proto'] === 'https'
 
 
-    }
-
-    if(process.env.NODE_ENV === "production"){cookieOptions.secure = true;}
-
-    res.cookie("jwt", token, cookieOptions);
+    });
     user.password = undefined; //just to remove the password from the response
     
     console.log("inside create token send");
@@ -71,7 +72,7 @@ exports.signUp = catchAsync(async (req,res,next)=>{
     const url = `${req.protocol}://${req.get('host')}/me`;
     await new Email(newUser,url).sendWelcome();
     //create jwt and send it back to user is response when they signs up
-    createSendToken(newUser, 201, res);
+    createSendToken(newUser, 201, req,res);
 
 });
 
@@ -98,7 +99,7 @@ exports.login =catchAsync(async  (req,res,next)=>{
     }
     //send token if all OK
     
-    createSendToken(userFound, 200, res);
+    createSendToken(userFound, 200,req, res);
     
     }
 
@@ -301,7 +302,7 @@ if (!user){
 
       //update changedPasswordAt property for the user
       //login the user and return JWT
-      createSendToken(user, 200, res);
+      createSendToken(user, 200,req, res);
 
     });
 
@@ -327,7 +328,7 @@ if (!user){
      await user.save();  //findbyIdandUpdate will not work ..refer chap 137 for details
 
       
-     createSendToken(user, 200, res);
+     createSendToken(user, 200, req,res);
 
 
     }

@@ -20,6 +20,7 @@ const hpp = require("hpp");
 const cookieParser = require('cookie-parser');
 
 const app = express(); //express is a function that will return a bunch of methods to app variable
+app.enable('trust proxy'); //enable proxy servers ..eg heroku uses proxy when sending request to app.
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public'))); //this is to serve static files which cant be served through route

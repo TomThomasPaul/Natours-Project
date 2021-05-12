@@ -67,4 +67,14 @@ process.exit(1);
 
 })
 
+process.on('SIGTERM',()=>{
+
+console.log("SIGTERM SIGNAL FROM HEROKU RECEIVED. SHUTTING DOWN GRACEFULLY!");
+server.close(()=>{
+
+  console.log("Process terminated due to SIGTERM");
+})
+
+})
+
 
