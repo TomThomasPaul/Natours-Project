@@ -52,7 +52,7 @@ const app = require(`./app`);
 //console.log(app.get('env'));
 //console.log('just after require app');
 const port = process.env.PORT || 1440;
-const server = app.listen(port, '127.0.0.1', () => {
+const server = app.listen(port, () => {
   console.log(`Server is listening now on port ${port}`);
 });
 
