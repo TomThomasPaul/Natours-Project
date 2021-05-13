@@ -10,6 +10,7 @@ const reviewRouter = require(`${__dirname}/routes/reviewRoutes`);
 const viewRouter =require(`${__dirname}/routes/viewRoutes`);
 const bookingRouter = require(`${__dirname}/routes/bookingRoutes`);
 const bookingController = require(`${__dirname}/controllers/bookingController`);
+const cors = require('cors');
 
 
 const AppError = require(`${__dirname}/utils/appError`);
