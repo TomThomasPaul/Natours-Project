@@ -91,7 +91,9 @@ await Booking.create({tour,user,price});
 
 exports.webHookCheckout = (req,res,next)=>{
   console.log("inside webhookcheckout");
-const signature = req.headers('stripe-signature');
+  console.log(req.headers);
+const signature = req.headers['stripe-signature'];
+//console.log("inside webhookcheckout after signature");
 
 let event;
 try{
