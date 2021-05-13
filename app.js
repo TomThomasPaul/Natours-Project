@@ -21,7 +21,7 @@ const mongoSanitize = require("express-mongo-sanitize");
 const xssClean = require("xss-clean");
 const hpp = require("hpp");
 const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
+//const bodyParser = require('body-parser');
 
 const app = express(); //express is a function that will return a bunch of methods to app variable
 app.enable('trust proxy'); //enable proxy servers ..eg heroku uses proxy when sending request to app.
@@ -36,7 +36,7 @@ app.use(express.static(path.join(__dirname, 'public'))); //this is to serve stat
 app.use(cors()); //same as above code
 app.options('*', cors()); //allow patch ,delete requests for cross origin requests..patch,delete aare not simple requests so add this line
 
-app.post('/webhook-checkout', bodyParser.raw({type: 'application/json'}), bookingController.webHookCheckout);  //request from stripe is in readablestream..so placing it before body parser
+app.post('/webhook-checkout', express.raw({type: '*/*'}), bookingController.webHookCheckout);  //request from stripe is in readablestream..so placing it before body parser
 
 app.use(express.json({limit : '10kb'})); //middleware needed when using POST..body parser..to facilitate req.body......
 app.use(cookieParser()); //enable cookies from browser to the app
