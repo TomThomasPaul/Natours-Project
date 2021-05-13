@@ -8,7 +8,8 @@ const bookingController = require(`../controllers/bookingController`);
 
 router
 .route('/')
-.get(bookingController.createBookingAtCheckout, authController.isLoggedIn,viewController.getOverview);
+.get(//bookingController.createBookingAtCheckout, 
+     authController.isLoggedIn,viewController.getOverview);
 
 router
 .route('/tour/:slug')

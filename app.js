@@ -9,6 +9,8 @@ const userRouter = require(`${__dirname}/routes/userRoutes`);
 const reviewRouter = require(`${__dirname}/routes/reviewRoutes`);
 const viewRouter =require(`${__dirname}/routes/viewRoutes`);
 const bookingRouter = require(`${__dirname}/routes/bookingRoutes`);
+const bookingController = require(`${__dirname}/controllers/bookingController`);
+
 
 const AppError = require(`${__dirname}/utils/appError`);
 const globalErrorHandler = require(`${__dirname}/controllers/errorController`);
@@ -31,6 +33,9 @@ app.use(express.static(path.join(__dirname, 'public'))); //this is to serve stat
 // });
 app.use(cors()); //same as above code
 app.options('*', cors()); //allow patch ,delete requests for cross origin requests..patch,delete aare not simple requests so add this line
+
+app.post('/webhook-checkout', express.raw({type: 'application/json'}), bookingController.webHookCheckout);  //request from stripe is in readablestream..so placing it before body parser
+
 app.use(express.json({limit : '10kb'})); //middleware needed when using POST..body parser..to facilitate req.body......
 app.use(cookieParser()); //enable cookies from browser to the app
 app.use(express.urlencoded({extended:true, limit:'10kb'})); //allow urlencoded data when submitting forms
