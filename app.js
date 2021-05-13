@@ -21,6 +21,7 @@ const mongoSanitize = require("express-mongo-sanitize");
 const xssClean = require("xss-clean");
 const hpp = require("hpp");
 const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
 
 const app = express(); //express is a function that will return a bunch of methods to app variable
 app.enable('trust proxy'); //enable proxy servers ..eg heroku uses proxy when sending request to app.

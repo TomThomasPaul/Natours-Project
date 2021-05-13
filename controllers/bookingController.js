@@ -35,6 +35,21 @@ line_items:[
 
     }]
 
+// line_items: [
+//       {
+//         quantity: 1,
+//         price_data: {
+//           currency: 'usd',
+//           unit_amount: tour.price * 100,
+//           product_data: {
+//             name: `${tour.name} Tour`,
+//             description: tour.summary,
+//             images: [`${req.protocol}://${req.get('host')}/img/tours/${tour.imageCover}`],
+//           },
+//         },
+//       },
+//     ]
+
 });
 
 //send session
@@ -62,18 +77,25 @@ res.status(200).json({
 // })
 
 const createBookingAtCheckout = async session=>{
+
+  console.log("inside bookingatcheckout");
 const tour = session.client_reference_id;
 const user =(await User.findOne({email : session.customer_email})).id;
-const price = session.display_items[0].amount/100; //changed to display items as per video..stripe shows display items in stripe response
+//const user =(await User.findOne({email : session.customer_details.email})).id;
+
+//const price = session.display_items[0].amount/100; //changed to display items as per video..stripe shows display items in stripe response
+const price = session.amount_total/100;
 await Booking.create({tour,user,price});
 
-}
-exports.webHookCheckout = (req,res,next)=>{
+};
 
+exports.webHookCheckout = (req,res,next)=>{
+  console.log("inside webhookcheckout");
 const signature = req.headers('stripe-signature');
 
 let event;
 try{
+  console.log("try inside webhookcheckout");
 event = stripe.webhooks.constructEvent(req.body,signature, process.env.STRIPE_WEBHOOK_SECRET);
 
 
@@ -82,12 +104,12 @@ return res.status(400).send(`Webhook error: ${err}`);
 
 }
 
-if(event.type === 'checkout.session.completed'){
-
+if(event.type === "checkout.session.completed"){
+  console.log("inside checkout session completed");
   createBookingAtCheckout(event.data.object);
   res.status(200).json({received: true});
 }
-
+next();
 };
 exports.createBooking = factory.createOne(Booking);
 exports.getBooking = factory.getOne(Booking);
