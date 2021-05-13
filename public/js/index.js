@@ -4,6 +4,7 @@ import "babel-core/register";
 import "babel-polyfill";
 import { updateSettings } from './updateSettings';
 import {bookTour} from './stripe';
+import { showAlert } from './alerts';
 
 //import '@babel/polyfill';
 //import "regenerator-runtime/runtime.js";
@@ -94,4 +95,11 @@ bookTour(tourId);
 })
 
 
+}
+
+
+const alertMessage = document.querySelector('body').dataset.alert;
+if(alertMessage){
+
+    showAlert('success', alertMessage);
 }
